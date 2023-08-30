@@ -46,6 +46,11 @@ public:
                       const Color& color, const int& layer);
   void draw_fill_rect(const RectF& rect, const Color& color,
                       const int& layer);
+  void draw_texture(SDL_Texture* texture, const RectF& src_rect,
+                    const RectF& dest_rect, const int& layer);
+  void draw_texture_mod(SDL_Texture* texture, const RectF& src_rect,
+                        const RectF& dest_rect, const Color& color,
+                        const int& layer);
 
   /** Updating (processing + rendering) */
   void update();
@@ -55,6 +60,8 @@ protected:
   virtual void process_draw_line(const LineRenderRequest& request) = 0;
   virtual void process_draw_rect(const RectRenderRequest& request) = 0;
   virtual void process_draw_fill_rect(const FillRectRenderRequest& request) = 0;
+  virtual void process_draw_texture(const TextureRenderRequest& request) = 0;
+  virtual void process_draw_texture_mod(const TextureModRenderRequest& request) = 0;
 
   /** Rendering */
   virtual void clear() = 0;

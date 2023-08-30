@@ -71,6 +71,21 @@ Renderer::draw_fill_rect(const RectF& rect, const Color& color,
   m_requests.push_back(std::make_unique<FillRectRenderRequest>(layer, rect, color));
 }
 
+void
+Renderer::draw_texture(SDL_Texture* texture, const RectF& src_rect,
+                       const RectF& dest_rect, const int& layer)
+{
+  m_requests.push_back(std::make_unique<TextureRenderRequest>(layer, texture, src_rect, dest_rect));
+}
+
+void
+Renderer::draw_texture_mod(SDL_Texture* texture, const RectF& src_rect,
+                           const RectF& dest_rect, const Color& color,
+                           const int& layer)
+{
+  m_requests.push_back(std::make_unique<TextureModRenderRequest>(layer, texture, src_rect, dest_rect, color));
+}
+
 
 void
 Renderer::update()
@@ -98,6 +113,12 @@ Renderer::update()
         break;
       case RenderRequest::FILL_RECT:
         process_draw_fill_rect(static_cast<FillRectRenderRequest&>(*request));
+        break;
+      case RenderRequest::TEXTURE:
+        process_draw_texture(static_cast<TextureRenderRequest&>(*request));
+        break;
+      case RenderRequest::TEXTURE_MOD:
+        process_draw_texture_mod(static_cast<TextureModRenderRequest&>(*request));
         break;
     }
   }

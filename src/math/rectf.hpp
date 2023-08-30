@@ -61,6 +61,11 @@ public:
     return { get_left(), get_top(),
              get_width(), get_height() };
   }
+  SDL_Rect to_sdl_rect() const
+  {
+    return { static_cast<int>(get_left()), static_cast<int>(get_top()),
+             static_cast<int>(get_width()), static_cast<int>(get_height()) };
+  }
 
   friend std::ostream& operator<<(std::ostream& os, const RectF& rect);
 

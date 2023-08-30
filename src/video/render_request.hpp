@@ -21,8 +21,6 @@
 #include "math/rectf.hpp"
 #include "video/color.hpp"
 
-class RectF;
-
 /** Represents a request for the renderer to process. */
 class RenderRequest
 {
@@ -32,7 +30,9 @@ public:
   {
     LINE,
     RECT,
-    FILL_RECT
+    FILL_RECT,
+    TEXTURE,
+    TEXTURE_MOD
   };
 
 public:
@@ -61,7 +61,7 @@ public:
     color(color_)
   {}
 
-  virtual RenderRequest::Type get_type() const override { return RenderRequest::LINE; }
+  RenderRequest::Type get_type() const override { return RenderRequest::LINE; }
 
 public:
   const Vector p1;
@@ -92,4 +92,39 @@ public:
   using RectRenderRequest::RectRenderRequest;
 
   RenderRequest::Type get_type() const override { return RenderRequest::FILL_RECT; }
+};
+
+class TextureRenderRequest : public RenderRequest
+{
+public:
+  TextureRenderRequest(const int& layer_, SDL_Texture* texture_,
+                       const RectF& src_rect_, const RectF& dest_rect_) :
+    RenderRequest(layer_),
+    texture(texture_),
+    src_rect(src_rect_),
+    dest_rect(dest_rect_)
+  {}
+
+  virtual RenderRequest::Type get_type() const override { return RenderRequest::TEXTURE; }
+
+public:
+  SDL_Texture* texture;
+  const RectF src_rect;
+  const RectF dest_rect;
+};
+
+class TextureModRenderRequest final : public TextureRenderRequest
+{
+public:
+  TextureModRenderRequest(const int& layer_, SDL_Texture* texture_,
+                          const RectF& src_rect_, const RectF& dest_rect_,
+                          const Color& color_) :
+    TextureRenderRequest(layer_, texture_, src_rect_, dest_rect_),
+    color(color_)
+  {}
+
+  RenderRequest::Type get_type() const override { return RenderRequest::TEXTURE_MOD; }
+
+public:
+  const Color color;
 };

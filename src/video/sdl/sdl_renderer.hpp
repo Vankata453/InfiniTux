@@ -20,9 +20,6 @@
 
 #include "video/renderer.hpp"
 
-class SDL_Renderer;
-class SDL_Window;
-
 /** Represents a renderer, powered by SDL. */
 class SDLRenderer final : public Renderer
 {
@@ -37,6 +34,8 @@ protected:
   void process_draw_line(const LineRenderRequest& request) override;
   void process_draw_rect(const RectRenderRequest& request) override;
   void process_draw_fill_rect(const FillRectRenderRequest& request) override;
+  void process_draw_texture(const TextureRenderRequest& request) override;
+  void process_draw_texture_mod(const TextureModRenderRequest& request) override;
 
   /** Rendering */
   void clear() override;

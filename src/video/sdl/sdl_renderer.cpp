@@ -79,6 +79,25 @@ SDLRenderer::process_draw_fill_rect(const FillRectRenderRequest& request)
     throw SDLError("SDL_RenderFillRectF", "Error drawing filled rectangle", SDL_GetError());
 }
 
+void
+SDLRenderer::process_draw_texture(const TextureRenderRequest& request)
+{
+  SDL_Rect src_rect = request.src_rect.to_sdl_rect();
+  SDL_FRect dest_rect = request.dest_rect.to_sdl();
+  if (SDL_RenderCopyF(m_renderer, request.texture, &src_rect, &dest_rect) < 0)
+    throw SDLError("SDL_RenderCopyF", "Error drawing texture", SDL_GetError());
+}
+
+void
+SDLRenderer::process_draw_texture_mod(const TextureModRenderRequest& request)
+{
+  SDL_SetTextureColorMod(request.texture, request.color.r, request.color.g,
+                                          request.color.b);
+  SDL_SetTextureAlphaMod(request.texture, request.color.a);
+
+  process_draw_texture(request);
+}
+
 
 void
 SDLRenderer::set_draw_color(const Color& color)
