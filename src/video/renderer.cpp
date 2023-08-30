@@ -27,6 +27,21 @@ Renderer::Renderer() :
 
 
 void
+Renderer::draw_line(const float& x1, const float& y1,
+                    const float& x2, const float& y2,
+                    const Color& color, const int& layer)
+{
+  draw_line(Vector(x1, y1), Vector(x2, y2), color, layer);
+}
+
+void
+Renderer::draw_line(const Vector& p1, const Vector& p2,
+                    const Color& color, const int& layer)
+{
+  m_requests.push_back(std::make_unique<LineRenderRequest>(layer, p1, p2, color));
+}
+
+void
 Renderer::draw_rect(const float& x, const float& y,
                     const float& w, const float& h,
                     const Color& color, const int& layer)
@@ -75,6 +90,9 @@ Renderer::update()
   {
     switch (request->get_type())
     {
+      case RenderRequest::LINE:
+        process_draw_line(static_cast<LineRenderRequest&>(*request));
+        break;
       case RenderRequest::RECT:
         process_draw_rect(static_cast<RectRenderRequest&>(*request));
         break;

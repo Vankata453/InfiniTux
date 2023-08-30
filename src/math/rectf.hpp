@@ -22,29 +22,49 @@
 
 #include <ostream>
 
+#include "math/sizef.hpp"
+#include "math/vector.hpp"
+
 class RectF final
 {
 public:
-  RectF(const float& x_, const float& y_,
-        const float& w_, const float& h_) :
-    x(x_),
-    y(y_),
-    w(w_),
-    h(h_)
+  RectF(const float& x, const float& y,
+        const float& w, const float& h) :
+    m_pos(x, y),
+    m_size(w, h)
+  {}
+  RectF(const Vector& pos,
+        const float& w, const float& h) :
+    m_pos(pos),
+    m_size(w, h)
+  {}
+  RectF(const float& x, const float& y,
+        const SizeF& size) :
+    m_pos(x, y),
+    m_size(size)
+  {}
+  RectF(const Vector& pos, const SizeF& size) :
+    m_pos(pos),
+    m_size(size)
   {}
 
-  const float& get_left() const { return x; }
-  const float& get_top() const { return y; }
-  const float& get_width() const { return w; }
-  const float& get_height() const { return h; }
+  const float& get_left() const { return m_pos.x; }
+  const float& get_top() const { return m_pos.y; }
+  const float& get_width() const { return m_size.w; }
+  const float& get_height() const { return m_size.h; }
+
+  const Vector& get_pos() const { return m_pos; }
+  const SizeF& get_size() const { return m_size; }
 
   SDL_FRect to_sdl() const
   {
-    return { x, y, w, h };
+    return { get_left(), get_top(),
+             get_width(), get_height() };
   }
 
   friend std::ostream& operator<<(std::ostream& os, const RectF& rect);
 
 private:
-  float x, y, w, h;
+  Vector m_pos;
+  SizeF m_size;
 };

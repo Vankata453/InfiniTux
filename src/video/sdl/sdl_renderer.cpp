@@ -50,6 +50,16 @@ SDLRenderer::render()
 
 
 void
+SDLRenderer::process_draw_line(const LineRenderRequest& request)
+{
+  set_draw_color(request.color);
+
+  if (SDL_RenderDrawLineF(m_renderer, request.p1.x, request.p1.y,
+                                      request.p2.x, request.p2.y) < 0)
+    throw SDLError("SDL_RenderDrawLineF", "Error drawing line", SDL_GetError());
+}
+
+void
 SDLRenderer::process_draw_rect(const RectRenderRequest& request)
 {
   set_draw_color(request.color);
@@ -66,7 +76,7 @@ SDLRenderer::process_draw_fill_rect(const FillRectRenderRequest& request)
 
   SDL_FRect rect = request.rect.to_sdl();
   if (SDL_RenderFillRectF(m_renderer, &rect) < 0)
-    throw SDLError("SDL_RenderFillRectF", "Error drawing rectangle", SDL_GetError());
+    throw SDLError("SDL_RenderFillRectF", "Error drawing filled rectangle", SDL_GetError());
 }
 
 

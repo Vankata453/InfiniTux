@@ -24,13 +24,18 @@
 #include "video/render_request.hpp"
 
 /** Abstract class, which represents a renderer.
-    Processes rendering requests in organized layers.  */
+    Processes rendering requests in organized layers. */
 class Renderer
 {
 public:
   Renderer();
 
   /** Requesting */
+  void draw_line(const float& x1, const float& y1,
+                 const float& x2, const float& y2,
+                 const Color& color, const int& layer);
+  void draw_line(const Vector& p1, const Vector& p2,
+                 const Color& color, const int& layer);
   void draw_rect(const float& x, const float& y,
                  const float& w, const float& h,
                  const Color& color, const int& layer);
@@ -47,6 +52,7 @@ public:
 
 protected:
   /** Processing */
+  virtual void process_draw_line(const LineRenderRequest& request) = 0;
   virtual void process_draw_rect(const RectRenderRequest& request) = 0;
   virtual void process_draw_fill_rect(const FillRectRenderRequest& request) = 0;
 

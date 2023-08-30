@@ -30,6 +30,7 @@ public:
   /** REQUEST TYPE LIST */
   enum Type
   {
+    LINE,
     RECT,
     FILL_RECT
   };
@@ -48,6 +49,25 @@ public:
 
 /** REQUEST TYPE DECLARATIONS */
 
+
+class LineRenderRequest final : public RenderRequest
+{
+public:
+  LineRenderRequest(const int& layer_, const Vector& p1_,
+                    const Vector& p2_, const Color& color_) :
+    RenderRequest(layer_),
+    p1(p1_),
+    p2(p2_),
+    color(color_)
+  {}
+
+  virtual RenderRequest::Type get_type() const override { return RenderRequest::LINE; }
+
+public:
+  const Vector p1;
+  const Vector p2;
+  const Color color;
+};
 
 class RectRenderRequest : public RenderRequest
 {

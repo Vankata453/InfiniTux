@@ -34,6 +34,7 @@ public:
 
 protected:
   /** Processing */
+  void process_draw_line(const LineRenderRequest& request) override;
   void process_draw_rect(const RectRenderRequest& request) override;
   void process_draw_fill_rect(const FillRectRenderRequest& request) override;
 
