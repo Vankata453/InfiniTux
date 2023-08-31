@@ -18,70 +18,123 @@
 
 #include "main/screen_manager.hpp"
 
+#include <cassert>
 #include <stdexcept>
 
 #include <SDL2/SDL.h>
 
 #include "main/resources.hpp"
-#include "video/color.hpp"
+#include "main/screen.hpp"
+#include "screens/test_screen.hpp"
 #include "video/renderer.hpp"
 #include "video/sdl/sdl_error.hpp"
 #include "video/sdl/sdl_video_system.hpp"
 
 ScreenManager::ScreenManager() :
-  m_video_system()
-  //m_screen_stack()
+  m_video_system(),
+  m_screen_stack(),
+  m_new_screen_stack(),
+  m_pop_screens(0)
 {
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     throw SDLError("SDL_Init", "Couldn't initialize SDL", SDL_GetError());
 
   m_video_system.reset(new SDLVideoSystem());
   Resources::initialize();
+
+  // Set up and push the initial screen.
+  auto init_screen = std::make_unique<TestScreen>();
+  init_screen->setup();
+  m_screen_stack.push_back(std::move(init_screen));
 }
 
 ScreenManager::~ScreenManager()
 {
+  // Leave the current screen.
+  m_screen_stack.back()->leave();
+
   Resources::destroy();
   m_video_system.reset();
 
   SDL_Quit();
 }
 
+
 int
 ScreenManager::main_loop()
 {
+  Renderer& renderer = m_video_system->get_renderer();
+
   bool quit = false;
   SDL_Event ev;
 
-  // TEMPORARY: Test texture to be drawn
-  const Texture& texture = m_video_system->get_texture_manager().load("../data/images/creatures/tux/tux.png");
-
-  // TEMPORARY: Test text to be drawn
-  Texture text = m_video_system->get_texture_manager()
-      .create_text(Resources::Fonts::default_font, "Test text", Color(0, 255, 188, 255));
-
   while (!quit)
   {
+    /** Event handling */
     while (SDL_PollEvent(&ev))
     {
       if (ev.type == SDL_QUIT)
+      {
         quit = true;
+        break;
+      }
+
+      // The screen should handle the event.
+      m_screen_stack.back()->event(ev);
     }
 
-    // TEMPORARY: Draw test rectangle, lines and textures
-    m_video_system->get_renderer().draw_rect(0.f, 10.f, 20.f, 20.f, Color(0, 188, 255, 255), 1);
-    m_video_system->get_renderer().draw_fill_rect(0.f, 60.f, 20.f, 20.f, Color(0, 255, 188, 255), 1);
-    m_video_system->get_renderer().draw_line(40.f, 50.f, 80.f, 92.f, Color(255, 30, 92, 255), 5);
-    m_video_system->get_renderer().draw_texture(texture, Vector(100.f, 100.f), 102);
-    m_video_system->get_renderer().draw_texture_mod(texture, Vector(200.f, 100.f), Color(255, 30, 92, 255), 102);
-    m_video_system->get_renderer().draw_texture_scaled(texture,
-        RectF(300.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), 102);
-    m_video_system->get_renderer().draw_texture_scaled_mod(texture,
-        RectF(400.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), Color(255, 30, 92, 255), 102);
-    m_video_system->get_renderer().draw_texture(text, Vector(400.f, 200.f), 102);
+    /** Rendering */
+    m_screen_stack.back()->draw(renderer); // Render the screen.
+    renderer.update();
 
-    m_video_system->get_renderer().update();
+    /** Updating ScreenManager */
+    handle_screen_switch();
   }
 
   return 0;
+}
+
+
+void
+ScreenManager::pop_screen()
+{
+  // Will be handled later in handle_screen_switch().
+  m_pop_screens++;
+}
+
+void
+ScreenManager::handle_screen_switch()
+{
+  if (m_pop_screens == 0 && m_new_screen_stack.empty())
+    return; // No screens to switch between.
+
+  // Leave the current screen.
+  m_screen_stack.back()->leave();
+
+  /** Pop screens */
+  assert(m_pop_screens < m_screen_stack.size());
+  while (m_pop_screens > 0)
+  {
+    m_screen_stack.pop_back();
+    m_pop_screens--;
+  }
+
+  /** Push screens */
+  if (!m_new_screen_stack.empty())
+  {
+    m_screen_stack.insert(m_screen_stack.end(),
+                          std::make_move_iterator(m_new_screen_stack.begin()),
+                          std::make_move_iterator(m_new_screen_stack.end()));
+    m_new_screen_stack.clear();
+  }
+
+  // Set up the new screen.
+  m_screen_stack.back()->setup();
+}
+
+
+Screen&
+ScreenManager::get_current_screen() const
+{
+  return *m_screen_stack.back();
 }

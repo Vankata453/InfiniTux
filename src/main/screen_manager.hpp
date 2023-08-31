@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-//class Screen;
+class Screen;
 class VideoSystem;
 
 class ScreenManager final : public CurrentObject<ScreenManager>
@@ -34,10 +34,26 @@ public:
 
   int main_loop();
 
+  /** Screen management */
+  template<typename T, typename... Args>
+  void push_screen(Args&&... args)
+  {
+    // Will be handled later in handle_screen_switch().
+    m_new_screen_stack.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+  }
+  void pop_screen();
+
+  Screen& get_current_screen() const;
+
+private:
+  void handle_screen_switch();
+
 private:
   std::unique_ptr<VideoSystem> m_video_system;
 
-  //std::vector<Screen> m_screen_stack;
+  std::vector<std::unique_ptr<Screen>> m_screen_stack;
+  std::vector<std::unique_ptr<Screen>> m_new_screen_stack;
+  size_t m_pop_screens;
 
 private:
   ScreenManager(const ScreenManager&) = delete;

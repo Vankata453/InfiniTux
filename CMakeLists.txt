@@ -35,6 +35,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 file(GLOB SRCFILES src/*.cpp
                    src/main/*.cpp
                    src/math/*.cpp
+                   src/screens/*.cpp
                    src/util/*.cpp
                    src/video/*.cpp
                    src/video/sdl/*.cpp)
