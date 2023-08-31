@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "util/current_object.hpp"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
@@ -28,12 +30,14 @@
 #include "video/color.hpp"
 #include "video/texture.hpp"
 
-/** Abstract class, which represents a texture manager.
+class Renderer;
+
+/** Represents a texture manager.
     Creates textures, binds textures to file paths. */
-class TextureManager
+class TextureManager final : public CurrentObject<TextureManager>
 {
 public:
-  TextureManager();
+  TextureManager(const Renderer& renderer);
 
   const Texture& load(const char* file);
 
@@ -43,10 +47,9 @@ public:
 private:
   const Texture& create(const char* file);
 
-protected:
-  virtual SDL_Texture* create_texture(SDL_Surface* surface) const = 0;
-
 private:
+  const Renderer& m_renderer;
+
   std::map<const char*, std::unique_ptr<Texture>> m_texture_map;
 
 private:

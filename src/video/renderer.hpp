@@ -33,6 +33,9 @@ public:
 
   TextureManager& get_texture_manager() const { return *m_texture_manager; }
 
+  /** Functions */
+  virtual SDL_Texture* create_texture(SDL_Surface* surface) const = 0;
+
   /** Requesting */
   void draw_line(const float& x1, const float& y1,
                  const float& x2, const float& y2,

@@ -29,6 +29,9 @@ public:
 
   void set_default_color(const Color& color) { m_default_color = color; }
 
+  /** Functions */
+  SDL_Texture* create_texture(SDL_Surface* surface) const override;
+
 protected:
   /** Processing */
   void process_draw_line(const LineRenderRequest& request) override;

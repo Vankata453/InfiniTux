@@ -21,14 +21,11 @@
 #include <SDL2/SDL.h>
 
 #include "video/sdl/sdl_error.hpp"
-#include "video/sdl/sdl_texture_manager.hpp"
 
 SDLRenderer::SDLRenderer(SDL_Window* window, const Color& default_color) :
   m_renderer(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED)),
   m_default_color(default_color)
 {
-  m_texture_manager.reset(new SDLTextureManager(m_renderer));
-
   SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
 }
 
@@ -108,6 +105,17 @@ SDLRenderer::process_draw_texture_scaled(const TextureScaledRenderRequest& reque
                           request.size.w, request.size.h };
   if (SDL_RenderCopyF(m_renderer, request.texture.get_sdl(), NULL, &dest_rect) < 0)
     throw SDLError("SDL_RenderCopyF", "Error drawing scaled texture", SDL_GetError());
+}
+
+
+SDL_Texture*
+SDLRenderer::create_texture(SDL_Surface* surface) const
+{
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, surface);
+  if (!texture)
+    throw SDLError("SDL_CreateTextureFromSurface", "Error creating texture from surface", SDL_GetError());
+
+  return texture;
 }
 
 

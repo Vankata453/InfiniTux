@@ -21,7 +21,7 @@
 #include <algorithm>
 
 Renderer::Renderer() :
-  m_texture_manager(),
+  m_texture_manager(new TextureManager(*this)),
   m_requests()
 {
 }

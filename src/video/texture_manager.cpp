@@ -18,11 +18,22 @@
 
 #include "video/texture_manager.hpp"
 
+#include <SDL2/SDL_image.h>
+
+#include "video/renderer.hpp"
 #include "video/sdl/sdl_error.hpp"
 
-TextureManager::TextureManager() :
+TextureManager::TextureManager(const Renderer& renderer) :
+  m_renderer(renderer),
   m_texture_map()
 {
+  /** Initialize SDL2_image */
+  if (IMG_Init(IMG_INIT_PNG) < 0)
+    throw SDLError("IMG_Init", "Error initializing SDL2_image with PNG support", IMG_GetError());
+  if (IMG_Init(IMG_INIT_JPG) < 0)
+    throw SDLError("IMG_Init", "Error initializing SDL2_image with JPG support", IMG_GetError());
+
+  /** Initialize SDL2_ttf */
   if (TTF_Init() < 0)
     throw SDLError("TTF_Init", "Error initializing SDL2_ttf", TTF_GetError());
 }
@@ -41,7 +52,11 @@ TextureManager::load(const char* file)
 const Texture&
 TextureManager::create(const char* file)
 {
-  auto texture = std::make_unique<Texture>(create_texture(file));
+  SDL_Surface* surface = IMG_Load(file);
+  if (!surface)
+    throw SDLError("IMG_Load", "Error loading image to surface", TTF_GetError());
+
+  auto texture = std::make_unique<Texture>(m_renderer.create_texture(surface));
   Texture& texture_ref = *texture;
 
   m_texture_map.insert({ file, std::move(texture) });
@@ -58,7 +73,7 @@ TextureManager::create_text(TTF_Font* font, const std::string& text,
   if (!surface)
     throw SDLError("TTF_RenderText_Solid", "Error rendering text to surface", TTF_GetError());
 
-  SDL_Texture* texture = create_texture(surface);
+  SDL_Texture* texture = m_renderer.create_texture(surface);
   SDL_FreeSurface(surface);
 
   return Texture(texture);
