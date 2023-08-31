@@ -25,9 +25,11 @@ project(InfiniTux)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+include_directories(${SDL2_TTF_INCLUDE_DIRS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 file(GLOB SRCFILES src/*.cpp
@@ -40,3 +42,4 @@ add_executable(InfiniTux ${SRCFILES})
 
 target_link_libraries(InfiniTux PUBLIC SDL2::SDL2)
 target_link_libraries(InfiniTux PUBLIC SDL2_image)
+target_link_libraries(InfiniTux PUBLIC SDL2_ttf)

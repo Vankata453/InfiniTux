@@ -22,6 +22,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "main/resources.hpp"
 #include "video/color.hpp"
 #include "video/renderer.hpp"
 #include "video/sdl/sdl_error.hpp"
@@ -35,10 +36,12 @@ ScreenManager::ScreenManager() :
     throw SDLError("SDL_Init", "Couldn't initialize SDL", SDL_GetError());
 
   m_video_system.reset(new SDLVideoSystem());
+  Resources::initialize();
 }
 
 ScreenManager::~ScreenManager()
 {
+  Resources::destroy();
   m_video_system.reset();
 
   SDL_Quit();
@@ -52,6 +55,10 @@ ScreenManager::main_loop()
 
   // TEMPORARY: Test texture to be drawn
   const Texture& texture = m_video_system->get_texture_manager().load("../data/images/creatures/tux/tux.png");
+
+  // TEMPORARY: Test text to be drawn
+  Texture text = m_video_system->get_texture_manager()
+      .create_text(Resources::Fonts::default_font, "Test text", Color(0, 255, 188, 255));
 
   while (!quit)
   {
@@ -71,6 +78,7 @@ ScreenManager::main_loop()
         RectF(300.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), 102);
     m_video_system->get_renderer().draw_texture_scaled_mod(texture,
         RectF(400.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), Color(255, 30, 92, 255), 102);
+    m_video_system->get_renderer().draw_texture(text, Vector(400.f, 200.f), 102);
 
     m_video_system->get_renderer().update();
   }

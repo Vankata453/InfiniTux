@@ -18,13 +18,18 @@
 
 #pragma once
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
 #include <map>
 #include <memory>
+#include <string>
 
+#include "video/color.hpp"
 #include "video/texture.hpp"
 
 /** Abstract class, which represents a texture manager.
-    Binds textures to file paths. */
+    Creates textures, binds textures to file paths. */
 class TextureManager
 {
 public:
@@ -32,11 +37,14 @@ public:
 
   const Texture& load(const char* file);
 
+  Texture create_text(TTF_Font* font, const std::string& text,
+                      const Color& color);
+
 private:
   const Texture& create(const char* file);
 
 protected:
-  virtual SDL_Texture* create_texture(const char* file) = 0;
+  virtual SDL_Texture* create_texture(SDL_Surface* surface) const = 0;
 
 private:
   std::map<const char*, std::unique_ptr<Texture>> m_texture_map;

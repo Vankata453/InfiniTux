@@ -18,11 +18,13 @@
 
 #include "video/texture_manager.hpp"
 
-#include <SDL2/SDL.h>
+#include "video/sdl/sdl_error.hpp"
 
 TextureManager::TextureManager() :
   m_texture_map()
 {
+  if (TTF_Init() < 0)
+    throw SDLError("TTF_Init", "Error initializing SDL2_ttf", TTF_GetError());
 }
 
 
@@ -45,4 +47,19 @@ TextureManager::create(const char* file)
   m_texture_map.insert({ file, std::move(texture) });
 
   return texture_ref;
+}
+
+
+Texture
+TextureManager::create_text(TTF_Font* font, const std::string& text,
+                            const Color& color)
+{
+  SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color.to_sdl());
+  if (!surface)
+    throw SDLError("TTF_RenderText_Solid", "Error rendering text to surface", TTF_GetError());
+
+  SDL_Texture* texture = create_texture(surface);
+  SDL_FreeSurface(surface);
+
+  return Texture(texture);
 }

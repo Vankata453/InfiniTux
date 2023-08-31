@@ -18,7 +18,6 @@
 
 #include "video/sdl/sdl_texture_manager.hpp"
 
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include "video/sdl/sdl_error.hpp"
@@ -27,14 +26,28 @@ SDLTextureManager::SDLTextureManager(SDL_Renderer* renderer) :
   m_renderer(renderer)
 {
   if (IMG_Init(IMG_INIT_PNG) < 0)
-    throw SDLError("IMG_Init", "Error initializing SDL_image with PNG support", IMG_GetError());
+    throw SDLError("IMG_Init", "Error initializing SDL2_image with PNG support", IMG_GetError());
   if (IMG_Init(IMG_INIT_JPG) < 0)
-    throw SDLError("IMG_Init", "Error initializing SDL_image with JPG support", IMG_GetError());
+    throw SDLError("IMG_Init", "Error initializing SDL2_image with JPG support", IMG_GetError());
 } 
 
 
 SDL_Texture*
-SDLTextureManager::create_texture(const char* file)
+SDLTextureManager::create_texture(const char* file) const
 {
-  return IMG_LoadTexture(m_renderer, file);
+  SDL_Texture* texture = IMG_LoadTexture(m_renderer, file);
+  if (!texture)
+    throw SDLError("IMG_LoadTexture", "Error loading texture from file", IMG_GetError());
+
+  return texture;
+}
+
+SDL_Texture*
+SDLTextureManager::create_texture(SDL_Surface* surface)const
+{
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, surface);
+  if (!texture)
+    throw SDLError("SDL_CreateTextureFromSurface", "Error creating texture from surface", SDL_GetError());
+
+  return texture;
 }

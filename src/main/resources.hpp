@@ -14,28 +14,19 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+*/ 
 
 #pragma once
 
-#include "video/texture_manager.hpp"
+#include <SDL2/SDL_ttf.h>
 
-class SDL_Renderer;
-
-/** Represents a texture manager, which creates textures using an SDL renderer. */
-class SDLTextureManager final : public TextureManager
+namespace Resources
 {
-public:
-  SDLTextureManager(SDL_Renderer* renderer);
+  namespace Fonts
+  {
+    extern TTF_Font* default_font;
+  };
 
-protected:
-  SDL_Texture* create_texture(const char* file) const override;
-  SDL_Texture* create_texture(SDL_Surface* surface) const override;
-
-private:
-  SDL_Renderer* m_renderer;
-
-private:
-  SDLTextureManager(const SDLTextureManager&) = delete;
-  SDLTextureManager& operator=(const SDLTextureManager&) = delete;
+  void initialize();
+  void destroy();
 };

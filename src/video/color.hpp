@@ -22,7 +22,7 @@
 
 #include <ostream>
 
-struct Color
+class Color final
 {
 public:
   Color() :
@@ -30,6 +30,11 @@ public:
   Color(const Uint8& r_, const Uint8& g_,
         const Uint8& b_, const Uint8& a_) :
     r(r_), g(g_), b(b_), a(a_) {}
+
+  SDL_Color to_sdl() const
+  {
+    return { r, g, b, a };
+  }
 
   friend std::ostream& operator<<(std::ostream& os, const Color& color);
 
