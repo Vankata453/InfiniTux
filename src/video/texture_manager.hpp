@@ -18,31 +18,30 @@
 
 #pragma once
 
-#include "util/current_object.hpp"
-
+#include <map>
 #include <memory>
-#include <vector>
 
-#include "video/renderer.hpp"
+#include "video/texture.hpp"
 
-class SDL_Window;
-
-/** Abstract class, which represents a video system. */
-class VideoSystem : public CurrentObject<VideoSystem>
+/** Abstract class, which represents a texture manager.
+    Binds textures to file paths. */
+class TextureManager
 {
 public:
-  VideoSystem();
-  virtual ~VideoSystem();
+  TextureManager();
 
-  SDL_Window* get_window() const { return m_window; }
-  Renderer& get_renderer() const { return *m_renderer; }
-  TextureManager& get_texture_manager() const { return m_renderer->get_texture_manager(); }
-
-protected:
-  SDL_Window* m_window;
-  std::unique_ptr<Renderer> m_renderer;
+  const Texture& load(const char* file);
 
 private:
-  VideoSystem(const VideoSystem&) = delete;
-  VideoSystem& operator=(const VideoSystem&) = delete;
+  const Texture& create(const char* file);
+
+protected:
+  virtual SDL_Texture* create_texture(const char* file) = 0;
+
+private:
+  std::map<const char*, std::unique_ptr<Texture>> m_texture_map;
+
+private:
+  TextureManager(const TextureManager&) = delete;
+  TextureManager& operator=(const TextureManager&) = delete;
 };

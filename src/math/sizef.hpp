@@ -27,6 +27,10 @@ public:
     w(w_),
     h(h_)
   {}
+  SizeF(const int& w_, const int& h_) :
+    w(static_cast<float>(w_)),
+    h(static_cast<float>(h_))
+  {}
 
   friend std::ostream& operator<<(std::ostream& os, const SizeF& size);
 

@@ -21,6 +21,7 @@
 #include <algorithm>
 
 Renderer::Renderer() :
+  m_texture_manager(),
   m_requests()
 {
 }
@@ -72,18 +73,31 @@ Renderer::draw_fill_rect(const RectF& rect, const Color& color,
 }
 
 void
-Renderer::draw_texture(SDL_Texture* texture, const RectF& src_rect,
-                       const RectF& dest_rect, const int& layer)
+Renderer::draw_texture(const Texture& texture, const Vector& pos,
+                       const int& layer)
 {
-  m_requests.push_back(std::make_unique<TextureRenderRequest>(layer, texture, src_rect, dest_rect));
+  draw_texture_mod(texture, pos, Color(), layer);
 }
 
 void
-Renderer::draw_texture_mod(SDL_Texture* texture, const RectF& src_rect,
-                           const RectF& dest_rect, const Color& color,
-                           const int& layer)
+Renderer::draw_texture_mod(const Texture& texture, const Vector& pos,
+                           const Color& color, const int& layer)
 {
-  m_requests.push_back(std::make_unique<TextureModRenderRequest>(layer, texture, src_rect, dest_rect, color));
+  m_requests.push_back(std::make_unique<TextureRenderRequest>(layer, texture, pos, color));
+}
+
+void
+Renderer::draw_texture_scaled(const Texture& texture, const RectF& dest_rect,
+                              const int& layer)
+{
+  draw_texture_scaled_mod(texture, dest_rect, Color(), layer);
+}
+
+void
+Renderer::draw_texture_scaled_mod(const Texture& texture, const RectF& dest_rect,
+                                  const Color& color, const int& layer)
+{
+  m_requests.push_back(std::make_unique<TextureScaledRenderRequest>(layer, texture, dest_rect, color));
 }
 
 
@@ -117,8 +131,8 @@ Renderer::update()
       case RenderRequest::TEXTURE:
         process_draw_texture(static_cast<TextureRenderRequest&>(*request));
         break;
-      case RenderRequest::TEXTURE_MOD:
-        process_draw_texture_mod(static_cast<TextureModRenderRequest&>(*request));
+      case RenderRequest::TEXTURE_SCALED:
+        process_draw_texture_scaled(static_cast<TextureScaledRenderRequest&>(*request));
         break;
     }
   }

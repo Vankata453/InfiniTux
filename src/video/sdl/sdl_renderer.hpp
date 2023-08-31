@@ -35,7 +35,7 @@ protected:
   void process_draw_rect(const RectRenderRequest& request) override;
   void process_draw_fill_rect(const FillRectRenderRequest& request) override;
   void process_draw_texture(const TextureRenderRequest& request) override;
-  void process_draw_texture_mod(const TextureModRenderRequest& request) override;
+  void process_draw_texture_scaled(const TextureScaledRenderRequest& request) override;
 
   /** Rendering */
   void clear() override;

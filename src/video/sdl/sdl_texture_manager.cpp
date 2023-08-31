@@ -16,33 +16,25 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "video/sdl/sdl_texture_manager.hpp"
 
-#include "util/current_object.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-#include <memory>
-#include <vector>
+#include "video/sdl/sdl_error.hpp"
 
-#include "video/renderer.hpp"
-
-class SDL_Window;
-
-/** Abstract class, which represents a video system. */
-class VideoSystem : public CurrentObject<VideoSystem>
+SDLTextureManager::SDLTextureManager(SDL_Renderer* renderer) :
+  m_renderer(renderer)
 {
-public:
-  VideoSystem();
-  virtual ~VideoSystem();
+  if (IMG_Init(IMG_INIT_PNG) < 0)
+    throw SDLError("IMG_Init", "Error initializing SDL_image with PNG support", IMG_GetError());
+  if (IMG_Init(IMG_INIT_JPG) < 0)
+    throw SDLError("IMG_Init", "Error initializing SDL_image with JPG support", IMG_GetError());
+} 
 
-  SDL_Window* get_window() const { return m_window; }
-  Renderer& get_renderer() const { return *m_renderer; }
-  TextureManager& get_texture_manager() const { return m_renderer->get_texture_manager(); }
 
-protected:
-  SDL_Window* m_window;
-  std::unique_ptr<Renderer> m_renderer;
-
-private:
-  VideoSystem(const VideoSystem&) = delete;
-  VideoSystem& operator=(const VideoSystem&) = delete;
-};
+SDL_Texture*
+SDLTextureManager::create_texture(const char* file)
+{
+  return IMG_LoadTexture(m_renderer, file);
+}

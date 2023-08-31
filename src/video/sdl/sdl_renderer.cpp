@@ -21,16 +21,21 @@
 #include <SDL2/SDL.h>
 
 #include "video/sdl/sdl_error.hpp"
+#include "video/sdl/sdl_texture_manager.hpp"
 
 SDLRenderer::SDLRenderer(SDL_Window* window, const Color& default_color) :
   m_renderer(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED)),
   m_default_color(default_color)
 {
+  m_texture_manager.reset(new SDLTextureManager(m_renderer));
+
   SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
 }
 
 SDLRenderer::~SDLRenderer()
 {
+  m_texture_manager.reset();
+
   SDL_DestroyRenderer(m_renderer);
 }
 
@@ -82,20 +87,27 @@ SDLRenderer::process_draw_fill_rect(const FillRectRenderRequest& request)
 void
 SDLRenderer::process_draw_texture(const TextureRenderRequest& request)
 {
-  SDL_Rect src_rect = request.src_rect.to_sdl_rect();
-  SDL_FRect dest_rect = request.dest_rect.to_sdl();
-  if (SDL_RenderCopyF(m_renderer, request.texture, &src_rect, &dest_rect) < 0)
+  SDL_SetTextureColorMod(request.texture.get_sdl(), request.color.r, request.color.g,
+                                                    request.color.b);
+  SDL_SetTextureAlphaMod(request.texture.get_sdl(), request.color.a);
+
+  SDL_FRect dest_rect = { request.pos.x, request.pos.y,
+                          request.texture.get_width(), request.texture.get_height() };
+  if (SDL_RenderCopyF(m_renderer, request.texture.get_sdl(), NULL, &dest_rect) < 0)
     throw SDLError("SDL_RenderCopyF", "Error drawing texture", SDL_GetError());
 }
 
 void
-SDLRenderer::process_draw_texture_mod(const TextureModRenderRequest& request)
+SDLRenderer::process_draw_texture_scaled(const TextureScaledRenderRequest& request)
 {
-  SDL_SetTextureColorMod(request.texture, request.color.r, request.color.g,
-                                          request.color.b);
-  SDL_SetTextureAlphaMod(request.texture, request.color.a);
+  SDL_SetTextureColorMod(request.texture.get_sdl(), request.color.r, request.color.g,
+                                                    request.color.b);
+  SDL_SetTextureAlphaMod(request.texture.get_sdl(), request.color.a);
 
-  process_draw_texture(request);
+  SDL_FRect dest_rect = { request.pos.x, request.pos.y,
+                          request.size.w, request.size.h };
+  if (SDL_RenderCopyF(m_renderer, request.texture.get_sdl(), NULL, &dest_rect) < 0)
+    throw SDLError("SDL_RenderCopyF", "Error drawing scaled texture", SDL_GetError());
 }
 
 

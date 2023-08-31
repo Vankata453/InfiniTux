@@ -25,9 +25,11 @@
 struct Color
 {
 public:
+  Color() :
+    r(255), g(255), b(255), a(255) {}
   Color(const Uint8& r_, const Uint8& g_,
         const Uint8& b_, const Uint8& a_) :
-  r(r_), g(g_), b(b_), a(a_) {}
+    r(r_), g(g_), b(b_), a(a_) {}
 
   friend std::ostream& operator<<(std::ostream& os, const Color& color);
 

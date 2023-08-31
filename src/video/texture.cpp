@@ -16,33 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "video/texture.hpp"
 
-#include "util/current_object.hpp"
-
-#include <memory>
-#include <vector>
-
-#include "video/renderer.hpp"
-
-class SDL_Window;
-
-/** Abstract class, which represents a video system. */
-class VideoSystem : public CurrentObject<VideoSystem>
+Texture::Texture(SDL_Texture* texture) :
+  m_texture(texture),
+  m_size(0.f, 0.f)
 {
-public:
-  VideoSystem();
-  virtual ~VideoSystem();
+  /** Size */
+  int w, h;
+  SDL_QueryTexture(m_texture, NULL, NULL, &w, &h);
+  m_size = SizeF(w, h); // Convert integer size to float for convenience.
+}
 
-  SDL_Window* get_window() const { return m_window; }
-  Renderer& get_renderer() const { return *m_renderer; }
-  TextureManager& get_texture_manager() const { return m_renderer->get_texture_manager(); }
-
-protected:
-  SDL_Window* m_window;
-  std::unique_ptr<Renderer> m_renderer;
-
-private:
-  VideoSystem(const VideoSystem&) = delete;
-  VideoSystem& operator=(const VideoSystem&) = delete;
-};
+Texture::~Texture()
+{
+  SDL_DestroyTexture(m_texture);
+}

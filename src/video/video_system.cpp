@@ -20,8 +20,6 @@
 
 #include <SDL2/SDL.h>
 
-#include "video/renderer.hpp"
-
 VideoSystem::VideoSystem() :
   m_window(),
   m_renderer()

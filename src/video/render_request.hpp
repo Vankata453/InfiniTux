@@ -21,6 +21,8 @@
 #include "math/rectf.hpp"
 #include "video/color.hpp"
 
+class Texture;
+
 /** Represents a request for the renderer to process. */
 class RenderRequest
 {
@@ -32,7 +34,8 @@ public:
     RECT,
     FILL_RECT,
     TEXTURE,
-    TEXTURE_MOD
+    TEXTURE_MOD,
+    TEXTURE_SCALED
   };
 
 public:
@@ -97,34 +100,33 @@ public:
 class TextureRenderRequest : public RenderRequest
 {
 public:
-  TextureRenderRequest(const int& layer_, SDL_Texture* texture_,
-                       const RectF& src_rect_, const RectF& dest_rect_) :
+  TextureRenderRequest(const int& layer_, const Texture& texture_,
+                       const Vector& pos_, const Color& color_) :
     RenderRequest(layer_),
     texture(texture_),
-    src_rect(src_rect_),
-    dest_rect(dest_rect_)
+    pos(pos_),
+    color(color_)
   {}
 
   virtual RenderRequest::Type get_type() const override { return RenderRequest::TEXTURE; }
 
 public:
-  SDL_Texture* texture;
-  const RectF src_rect;
-  const RectF dest_rect;
+  const Texture& texture;
+  const Vector pos;
+  const Color color;
 };
 
-class TextureModRenderRequest final : public TextureRenderRequest
+class TextureScaledRenderRequest final : public TextureRenderRequest
 {
 public:
-  TextureModRenderRequest(const int& layer_, SDL_Texture* texture_,
-                          const RectF& src_rect_, const RectF& dest_rect_,
-                          const Color& color_) :
-    TextureRenderRequest(layer_, texture_, src_rect_, dest_rect_),
-    color(color_)
+  TextureScaledRenderRequest(const int& layer_, const Texture& texture_,
+                             const RectF& dest_rect, const Color& color_) :
+    TextureRenderRequest(layer_, texture_, dest_rect.get_pos(), color_),
+    size(dest_rect.get_size())
   {}
 
-  RenderRequest::Type get_type() const override { return RenderRequest::TEXTURE_MOD; }
+  RenderRequest::Type get_type() const override { return RenderRequest::TEXTURE_SCALED; }
 
 public:
-  const Color color;
+  const SizeF size;
 };

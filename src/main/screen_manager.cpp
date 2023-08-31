@@ -50,6 +50,9 @@ ScreenManager::main_loop()
   bool quit = false;
   SDL_Event ev;
 
+  // TEMPORARY: Test texture to be drawn
+  const Texture& texture = m_video_system->get_texture_manager().load("../data/images/creatures/tux/tux.png");
+
   while (!quit)
   {
     while (SDL_PollEvent(&ev))
@@ -58,10 +61,16 @@ ScreenManager::main_loop()
         quit = true;
     }
 
-    // TEMPORARY: Draw test rectangles and lines
+    // TEMPORARY: Draw test rectangle, lines and textures
     m_video_system->get_renderer().draw_rect(0.f, 10.f, 20.f, 20.f, Color(0, 188, 255, 255), 1);
     m_video_system->get_renderer().draw_fill_rect(0.f, 60.f, 20.f, 20.f, Color(0, 255, 188, 255), 1);
     m_video_system->get_renderer().draw_line(40.f, 50.f, 80.f, 92.f, Color(255, 30, 92, 255), 5);
+    m_video_system->get_renderer().draw_texture(texture, Vector(100.f, 100.f), 102);
+    m_video_system->get_renderer().draw_texture_mod(texture, Vector(200.f, 100.f), Color(255, 30, 92, 255), 102);
+    m_video_system->get_renderer().draw_texture_scaled(texture,
+        RectF(300.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), 102);
+    m_video_system->get_renderer().draw_texture_scaled_mod(texture,
+        RectF(400.f, 100.f, texture.get_width() * 2, texture.get_height() * 2), Color(255, 30, 92, 255), 102);
 
     m_video_system->get_renderer().update();
   }
