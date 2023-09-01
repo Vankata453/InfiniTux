@@ -21,6 +21,7 @@
 #include <memory>
 #include <vector>
 
+#include "video/layer.hpp"
 #include "video/render_request.hpp"
 #include "video/texture_manager.hpp"
 
@@ -30,6 +31,10 @@ class Renderer
 {
 public:
   Renderer();
+
+  const float& get_width() const { return get_size().w; }
+  const float& get_height() const { return get_size().h; }
+  virtual const SizeF& get_size() const = 0;
 
   TextureManager& get_texture_manager() const { return *m_texture_manager; }
 

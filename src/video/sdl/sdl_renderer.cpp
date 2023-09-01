@@ -24,9 +24,15 @@
 
 SDLRenderer::SDLRenderer(SDL_Window* window, const Color& default_color) :
   m_renderer(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED)),
+  m_size(0.f, 0.f),
   m_default_color(default_color)
 {
   SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+
+  // Get size.
+  int w, h;
+  SDL_GetRendererOutputSize(m_renderer, &w, &h);
+  m_size = SizeF(w, h); // Convert integer size to float for convenience.
 }
 
 SDLRenderer::~SDLRenderer()

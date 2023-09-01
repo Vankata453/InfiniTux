@@ -29,6 +29,8 @@ public:
 
   void set_default_color(const Color& color) { m_default_color = color; }
 
+  const SizeF& get_size() const override { return m_size; }
+
   /** Functions */
   SDL_Texture* create_texture(SDL_Surface* surface) const override;
 
@@ -49,6 +51,7 @@ private:
 
 private:
   SDL_Renderer* m_renderer;
+  SizeF m_size;
 
   Color m_default_color;
 
