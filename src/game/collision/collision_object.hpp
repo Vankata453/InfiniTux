@@ -18,31 +18,24 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "game/collision/collision_hit.hpp"
+#include "math/rectf.hpp"
 
-#include "video/renderer.hpp"
-
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+/** Abstract class, which represents an object, taking part in collision. */
+class CollisionObject
 {
 public:
-  Screen() {}
+  CollisionObject();
+  virtual ~CollisionObject();
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
+  virtual void collision(CollisionObject* obj, const CollisionHit& hit) {}
 
-  /** Draw items on screen every frame. */
-  virtual void draw(Renderer& renderer) = 0;
+  const RectF& get_bbox() const { return m_bbox; }
 
-  /** Update screen logic every frame. */
-  virtual void update(const float& elapsed_sec) = 0;
-
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
+protected:
+  RectF m_bbox;
 
 private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
+  CollisionObject(const CollisionObject&) = delete;
+  CollisionObject& operator=(const CollisionObject&) = delete;
 };

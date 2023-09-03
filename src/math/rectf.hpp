@@ -28,6 +28,10 @@
 class RectF final
 {
 public:
+  RectF() :
+    m_pos(0.f, 0.f),
+    m_size(0.f, 0.f)
+  {}
   RectF(const float& x, const float& y,
         const float& w, const float& h) :
     m_pos(x, y),
@@ -49,13 +53,23 @@ public:
   {}
 
   const float& get_left() const { return m_pos.x; }
+  float get_right() const { return m_pos.x + m_size.w; }
   const float& get_top() const { return m_pos.y; }
+  float get_bottom() const { return m_pos.y + m_size.h; }
+
   const float& get_width() const { return m_size.w; }
   const float& get_height() const { return m_size.h; }
 
   const Vector& get_pos() const { return m_pos; }
   const SizeF& get_size() const { return m_size; }
 
+  void set_pos(const Vector& pos) { m_pos = pos; }
+  void set_size(const SizeF& size) { m_size = size; }
+
+  /** Utilities */
+  bool overlaps(const RectF& other) const;
+
+  /** Conversion */
   SDL_FRect to_sdl() const
   {
     return { get_left(), get_top(),

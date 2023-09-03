@@ -18,31 +18,26 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
-
-#include "video/renderer.hpp"
-
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+/** Contains information, regarding a collision hit.
+    Filled by CollisionSystem. */
+class CollisionHit final
 {
 public:
-  Screen() {}
+  CollisionHit() :
+    left(false), right(false), top(false), bottom(false)
+  {}
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
+  void reset()
+  {
+    left = false;
+    right = false;
+    top = false;
+    bottom = false;
+  }
 
-  /** Draw items on screen every frame. */
-  virtual void draw(Renderer& renderer) = 0;
-
-  /** Update screen logic every frame. */
-  virtual void update(const float& elapsed_sec) = 0;
-
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
-
-private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
+public:
+  bool left;
+  bool right;
+  bool top;
+  bool bottom;
 };

@@ -18,31 +18,32 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "util/current_object.hpp"
 
-#include "video/renderer.hpp"
+#include <vector>
 
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+class CollisionObject;
+class Renderer;
+
+/** Collision system. On update, determines whether any two objects intersect. */
+class CollisionSystem final : public CurrentObject<CollisionSystem>
 {
 public:
-  Screen() {}
+  CollisionSystem();
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
+  /** Render collision rectangles, if enabled. */
+  void draw(Renderer& renderer);
 
-  /** Draw items on screen every frame. */
-  virtual void draw(Renderer& renderer) = 0;
+  /** Perform collision checks (called each frame). */
+  void update();
 
-  /** Update screen logic every frame. */
-  virtual void update(const float& elapsed_sec) = 0;
-
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
+  void add_object(CollisionObject* obj);
+  void remove_object(CollisionObject* obj);
 
 private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
+  std::vector<CollisionObject*> m_objects;
+
+private:
+  CollisionSystem(const CollisionSystem&) = delete;
+  CollisionSystem& operator=(const CollisionSystem&) = delete;
 };

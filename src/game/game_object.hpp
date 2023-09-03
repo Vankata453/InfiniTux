@@ -22,27 +22,29 @@
 
 #include "video/renderer.hpp"
 
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+/** Abstract class, which represents a game object.
+    Serves as a component of a game. Able to be drawn on screen and updated. */
+class GameObject
 {
+  friend class GameObjectManager;
+
 public:
-  Screen() {}
+  GameObject() :
+    m_scheduled_for_removal(false)
+  {}
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
-
-  /** Draw items on screen every frame. */
+  /** Draw the object on screen every frame. */
   virtual void draw(Renderer& renderer) = 0;
 
-  /** Update screen logic every frame. */
+  /** Update object logic. */
   virtual void update(const float& elapsed_sec) = 0;
 
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
+  bool is_valid() const { return !m_scheduled_for_removal; }
 
 private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
+  bool m_scheduled_for_removal;
+
+private:
+  GameObject(const GameObject&) = delete;
+  GameObject& operator=(const GameObject&) = delete;
 };

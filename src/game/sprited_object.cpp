@@ -16,33 +16,21 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "game/sprited_object.hpp"
 
-#include <SDL2/SDL.h>
+#include "video/texture_manager.hpp"
 
-#include "video/renderer.hpp"
-
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+SpritedObject::SpritedObject(const std::string& sprite_file) :
+  m_sprite(TextureManager::current()->load(sprite_file.c_str()))
 {
-public:
-  Screen() {}
+  // Set bounding box size to sprite size.
+  m_bbox.set_size(m_sprite.get_size());
+}
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
 
-  /** Draw items on screen every frame. */
-  virtual void draw(Renderer& renderer) = 0;
-
-  /** Update screen logic every frame. */
-  virtual void update(const float& elapsed_sec) = 0;
-
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
-
-private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
-};
+void
+SpritedObject::draw(Renderer& renderer)
+{
+  /** TODO: Support for sprites, containing multiple textures. */
+  renderer.draw_texture(m_sprite, m_bbox.get_pos(), LAYER_OBJECTS);
+}

@@ -18,31 +18,21 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "game/moving_object.hpp"
 
-#include "video/renderer.hpp"
-
-/** Abstract class, which represents a screen.
-    Determines what is drawn on screen, and processes any occuring events. */
-class Screen
+/** Abstract class, which represents a moving object, displayed with a sprite. */
+class SpritedObject : public MovingObject
 {
 public:
-  Screen() {}
+  SpritedObject(const std::string& sprite_file);
 
-  /** Perform actions on screen setup and leave. */
-  virtual void setup() {}
-  virtual void leave() {}
-
-  /** Draw items on screen every frame. */
-  virtual void draw(Renderer& renderer) = 0;
-
-  /** Update screen logic every frame. */
-  virtual void update(const float& elapsed_sec) = 0;
-
-  /** Process any occuring events. */
-  virtual void event(const SDL_Event& ev) = 0;
+  virtual void draw(Renderer& renderer) override;
 
 private:
-  Screen(const Screen&) = delete;
-  Screen& operator=(const Screen&) = delete;
+  /** TODO: Support for sprites, containing multiple textures. */
+  const Texture& m_sprite;
+
+private:
+  SpritedObject(const SpritedObject&) = delete;
+  SpritedObject& operator=(const SpritedObject&) = delete;
 };

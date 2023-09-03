@@ -33,6 +33,8 @@ include_directories(${SDL2_TTF_INCLUDE_DIRS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 file(GLOB SRCFILES src/*.cpp
+                   src/game/*.cpp
+                   src/game/collision/*.cpp
                    src/main/*.cpp
                    src/math/*.cpp
                    src/screens/*.cpp

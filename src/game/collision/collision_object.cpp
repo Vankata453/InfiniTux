@@ -16,32 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "game/collision/collision_object.hpp"
 
-#include "main/screen.hpp"
+#include "game/collision/collision_system.hpp"
 
-class Texture;
-
-/** Screen to test rendering and event handling. */
-class TestScreen final : public Screen
+CollisionObject::CollisionObject() :
+  m_bbox()
 {
-public:
-  TestScreen();
+  if (CollisionSystem::current())
+    CollisionSystem::current()->add_object(this);
+}
 
-  void setup() override;
-  void leave() override;
-
-  void draw(Renderer& renderer) override;
-  void event(const SDL_Event& ev) override;
-
-private:
-  Texture get_text_texture() const;
-
-private:
-  const Texture& m_texture;
-  Texture m_text_texture;
-
-private:
-  TestScreen(const TestScreen&) = delete;
-  TestScreen& operator=(const TestScreen&) = delete;
-};
+CollisionObject::~CollisionObject()
+{
+  if (CollisionSystem::current())
+    CollisionSystem::current()->remove_object(this);
+}

@@ -18,7 +18,12 @@
 
 #pragma once
 
+#include <SDL2/SDL.h>
+
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 
 extern const char* GAME_TITLE;
+
+/** Amount of frames per second, in which the game logic should be updated. */
+extern const Uint32 LOGICAL_FPS;

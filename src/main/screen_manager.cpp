@@ -23,9 +23,10 @@
 
 #include <SDL2/SDL.h>
 
+#include "main/constants.hpp"
 #include "main/resources.hpp"
 #include "main/screen.hpp"
-#include "screens/test_screen.hpp"
+#include "screens/game_session.hpp"
 #include "video/renderer.hpp"
 #include "video/sdl/sdl_error.hpp"
 #include "video/sdl/sdl_video_system.hpp"
@@ -43,7 +44,7 @@ ScreenManager::ScreenManager() :
   Resources::initialize();
 
   // Set up and push the initial screen.
-  auto init_screen = std::make_unique<TestScreen>();
+  auto init_screen = std::make_unique<GameSession>();
   init_screen->setup();
   m_screen_stack.push_back(std::move(init_screen));
 }
@@ -67,9 +68,13 @@ ScreenManager::main_loop()
 
   bool quit = false;
   SDL_Event ev;
+  Uint32 refresh_time = SDL_GetTicks() + LOGICAL_FPS;
+  Uint32 last_update_time = 0;
 
   while (!quit)
   {
+    auto& screen = m_screen_stack.back();
+
     /** Event handling */
     while (SDL_PollEvent(&ev))
     {
@@ -80,15 +85,24 @@ ScreenManager::main_loop()
       }
 
       // The screen should handle the event.
-      m_screen_stack.back()->event(ev);
+      screen->event(ev);
     }
 
+    /** Updating */
+    const Uint32 current_time = SDL_GetTicks();
+    screen->update(static_cast<float>(current_time - last_update_time) / 1000.f);
+    last_update_time = current_time;
+
     /** Rendering */
-    m_screen_stack.back()->draw(renderer); // Render the screen.
+    screen->draw(renderer); // Render the screen.
     renderer.update();
 
-    /** Updating ScreenManager */
+    /** Update ScreenManager */
     handle_screen_switch();
+
+    /** Achieve constant framerate */
+    SDL_Delay(refresh_time - current_time);
+    refresh_time += LOGICAL_FPS;
   }
 
   return 0;

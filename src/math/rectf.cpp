@@ -18,6 +18,20 @@
 
 #include "math/rectf.hpp"
 
+bool
+RectF::overlaps(const RectF& other) const
+{
+  // Ensure there is horizontal overlap.
+  if (get_left() >= other.get_right() || other.get_left() >= get_right())
+    return false;
+  // Ensure there is vertical overlap.
+  if (get_top() >= other.get_bottom() || other.get_top() >= get_bottom())
+    return false;
+
+  return true;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const RectF& rect)
 {
   os << "RECT["
